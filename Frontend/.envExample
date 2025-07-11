@@ -1,1 +1,2 @@
-cloudinary_test_key =
+VITE_BACKEND_URL=
+VITE_RAZORPAY_KEY_ID=

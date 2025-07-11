@@ -45,7 +45,7 @@ const PostTask = () => {
     };
 
     try {
-      await axios.post("http://localhost:3000/api/task/tasks", dataToSend, {
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/task/tasks`, dataToSend, {
         withCredentials: true,
       });
 

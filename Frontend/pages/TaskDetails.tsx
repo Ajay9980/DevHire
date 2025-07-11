@@ -206,7 +206,7 @@ const TaskDetails = () => {
 
 
       const options = {
-        key : process.env.cloudinary_test_key,
+        key : import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount : order.amount,
         currency : order.currency,
         order_id : order.id,

@@ -7,12 +7,12 @@ const Profile = () => {
 
   const navigate = useNavigate()
    
-  const [user , setUser] = useState<{ imgurl : string , email : string , name : string , role :'CLIENT' | 'DEVELOPER'}>()
-  const [earning , setEarning] = useState()
+  const [user , setUser] = useState<{ imgurl : string , email : string , name : string , role :'CLIENT' | 'DEVELOPER'} | null>(null)
+  const [earning , setEarning] = useState<number>(0)
   async function getUser(){
 
     // const res = await axios.get("http://localhost:3000/api/user/user",{
-    const res = await axios.get("${import.meta.env.VITE_BACKEND_URL}/api/user/user",{
+    const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/user/user`,{
       withCredentials : true
     })
 
@@ -26,8 +26,8 @@ const Profile = () => {
 
   async function getUserEarnings(){
 
-    const res = await axios.get('http://localhost:3000/api/payment/getuserpayment',{
-    const res = await axios.get('${import.meta.env.VITE_BACKEND_URL}/api/payment/getuserpayment',{
+    // const res = await axios.get('http://localhost:3000/api/payment/getuserpayment',{
+    const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/payment/getuserpayment`,{
       withCredentials : true
     })
    setEarning(res.data.earnings) 
@@ -43,7 +43,7 @@ const Profile = () => {
   // Logout handler
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:3000/api/user/signout', {},{
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/user/signout`, {},{
         withCredentials : true
       });
 

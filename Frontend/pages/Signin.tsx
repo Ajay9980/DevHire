@@ -23,7 +23,7 @@ const Signin = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://localhost:3000/api/user/signin", formData, {
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/user/signin`, formData, {
         withCredentials: true,
       });
 

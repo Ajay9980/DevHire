@@ -28,7 +28,8 @@ function PostedBids() {
 
   async function getuserBid() {
     try {
-      const res = await axios.get("http://localhost:3000/api/task/bidtask", {
+      // const res = await axios.get(`http://localhost:3000/api/task/bidtask`, {
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/task/bidtask`, {
         withCredentials: true,
       });
       setBids(res.data.tasks);

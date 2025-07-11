@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int              @id @default(autoincrement())
+  email       String           @unique
+  password    String
+  name        String
+  imgurl      String?
+  role        Role
+  tasks       Task[]           @relation("ClientTasks")
+  bids        Bid[]            @relation("DeveloperBids")
+  submissions TaskSubmission[] @relation("UserSubmissions")
+  Payment     Payment[]
+}
+
+model Task {
+  id          Int              @id @default(autoincrement())
+  title       String
+  description String
+  budget      Int
+  client      User             @relation("ClientTasks", fields: [clientId], references: [id])
+  clientId    Int
+  bids        Bid[]
+  payment     Payment[]        @relation("payment")
+  submissions TaskSubmission[] @relation("TaskSubmission")
+  status      TaskStatus?      @default(OPEN)
+  completedAt DateTime?
+}
+
+model Bid {
+  id          Int       @id @default(autoincrement())
+  amount      Int
+  proposal    String
+  status      BidStatus @default(PENDING)
+  task        Task      @relation(fields: [taskId], references: [id])
+  taskId      Int
+  developer   User      @relation("DeveloperBids", fields: [developerId], references: [id])
+  developerId Int
+  Payment     Payment[]
+}
+
+model TaskSubmission {
+  id          Int      @id @default(autoincrement())
+  task        Task     @relation("TaskSubmission", fields: [taskId], references: [id])
+  taskId      Int
+  developer   User     @relation("UserSubmissions", fields: [developerId], references: [id])
+  developerId Int
+  fileUrl     String
+  submittedAt DateTime @default(now())
+}
+
+model Payment {
+  id                Int           @id @default(autoincrement())
+  task              Task          @relation("payment", fields: [taskId], references: [id])
+  taskId            Int
+  bid               Bid           @relation(fields: [bidId], references: [id])
+  bidId             Int
+  developer         User?         @relation(fields: [developerId], references: [id])
+  developerId       Int?
+  amount            Int
+  currency          String        @default("INR")
+  razorpayOrderId   String
+  razorpayPaymentId String?
+  razorpaySignature String?
+  status            PaymentStatus @default(CREATED)
+  createdAt         DateTime      @default(now())
+}
+
+enum PaymentStatus {
+  CREATED
+  PAID
+  FAILED
+}
+
+enum BidStatus {
+  PENDING
+  REJECTED
+  ACCEPTED
+}
+
+enum Role {
+  CLIENT
+  DEVELOPER
+}
+
+enum TaskStatus {
+  OPEN
+  IN_PROGRESS
+  SUBMITTED
+  COMPLETED
+}

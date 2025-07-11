@@ -1,0 +1,351 @@
+import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+import path from 'path'
+import { PrismaClient } from '@prisma/client'
+
+import express from 'express'
+import cookieParser from 'cookie-parser'
+import { Request , Response } from 'express'
+import { customRequest, userMiddleware } from './middlewares/userMiddleware'
+import { uploadOnCloudinary } from './utils/cloudinary'
+import { upload } from './middlewares/multerMiddleware'
+const app = express()
+const prisma = new PrismaClient()
+app.use(express.json())
+app.use(cookieParser())
+dotenv.config()
+
+
+app.post('/signup' , async function(req ,res){
+    const { email ,password , name , role}  = req.body
+    try{
+        const user = await prisma.user.create({
+            data : {
+                email , 
+                password,
+                name,
+                role
+            }
+        })
+
+        res.status(201).json({
+            message : 'user Created',
+            user : user
+        })
+    }catch(error){
+        res.status(500).json({
+            message : 'something went wrong'
+        })
+    }
+
+})
+
+
+app.post('/signin',async function(req  : Request, res : Response){
+    const {email , password} = req.body
+
+    try{
+        const user = await prisma.user.findUnique({
+            where : {
+                email : email,
+                password : password
+            }
+        })
+
+        if(user){
+
+            const token = jwt.sign({userId : user.id},process.env.JWT_SECRET as string)
+            res.cookie('token',token,{
+                httpOnly : true,
+                secure : false,
+                sameSite : 'lax'
+            })
+
+            res.status(200).json({
+                message : 'user Signed in ',
+                
+            })
+
+
+        }else{
+            res.status(204).json({
+                message : 'user not found'
+            })
+        }
+    }catch(error){
+        res.status(500).json({
+            message : 'something went wrong :-  ' + error
+        })
+    }
+})
+
+
+app.post('/tasks',userMiddleware,async function(req : customRequest ,res : Response){
+    const {title , description , budget } = req.body
+    const userId = req.userId
+
+    try{
+
+        if(!userId){
+            res.status(201).json({
+                message : 'user not logged in'
+            })
+            return;
+        }
+
+        const user = await prisma.user.findUnique({
+            where : {
+                id : userId
+            }
+        })
+
+        if(user?.role === 'CLIENT'){
+            await prisma.task.create({
+                data : {
+                    title , 
+                    description ,
+                    budget,
+                    clientId : userId
+                }
+            })
+        
+            res.status(200).json({
+                message : 'task posted'
+            })
+
+        }else{
+            res.status(201).json({
+                message : 'you are developer , so you are not allowed to post the task'
+            })
+        }
+
+    }catch(error){
+        res.status(500).json({
+            messsage : 'something went wrong :- ' + error
+        })
+
+    }
+})
+
+
+
+
+app.get('/tasks',userMiddleware,async function(req : customRequest,res){
+
+        const userId = req.userId
+    try{
+
+        const user = await prisma.user.findUnique({
+            where : {
+                id : userId
+            }
+        })
+
+        if(user?.role === 'DEVELOPER'){
+            const tasks = await prisma.task.findMany()
+        
+            res.status(200).json({
+                tasks : tasks
+            })
+        }else{
+            res.status(201).json({
+                message : 'only developers are allowed to see the Tasks'
+            })
+        }
+
+
+    }catch(error){
+        res.status(500).json({
+            message : 'something went wrong:- ' + error
+        })
+    }
+})
+ 
+
+app.post('/bid/:id',userMiddleware,async function(req : customRequest ,res){
+    const {amount , proposal} = req.body
+    const taskId = parseInt(req.params.id)
+    const userId = req.userId
+
+    try{
+        if(!userId){
+            res.status(201).json({
+                message : 'user not logged in'
+            })
+            return;
+        }
+
+        const user = await prisma.user.findUnique({
+            where : {
+                id : userId
+            }
+        })
+    
+        if(user?.role === 'DEVELOPER'){
+            const bid = await prisma.bid.create({
+                data : {
+                    amount ,
+                    proposal,
+                    taskId,
+                    developerId : userId
+
+                }
+            })
+        
+            res.status(200).json({
+                message : 'you bid has been posted to client',
+                bid : bid
+            })
+    
+        }else{
+            res.status(201).json({
+                messsage :'Only developers can post the bids !'
+            })
+        }
+    }catch(error){
+        res.status(500).json({
+            message :'something went wrong'
+        })
+    }
+
+})
+
+
+
+app.post('/acceptbid/task/:id',userMiddleware,async function(req : customRequest ,res){
+
+    const taskId = parseInt(req.params.id)
+    const {bidId} = req.body
+    const userId = req.userId
+
+    try{
+        
+    // getting the task
+    const task = await prisma.task.findUnique({
+        where : {
+            id : taskId
+        }
+    })
+    if(!task){
+        res.status(404).json({
+            message : 'invalid Id , Task Not Found'
+        })
+        return
+    }
+    // checking if the task belongs to client
+    if(task.clientId === userId){
+
+         await prisma.bid.update({
+            where : {id : bidId},
+            data : {status : 'ACCEPTED'} //accepting the bid
+         })
+
+
+         await prisma.bid.updateMany({
+            where : {
+                taskId : taskId ,
+                id : {not : bidId}
+                },
+                data : {
+                    status : 'REJECTED' // rejecting  all other bid
+                }
+         })
+
+
+         res.status(200).json({
+            message : 'Bid Accepted'
+         })
+    }else{
+        res.status(403).json({
+            message : 'Unauthorized Client !'
+        })
+    }
+}catch(error){
+    res.status(500).json({
+        message : 'something  went wrong'
+    })
+}
+
+})
+
+
+
+
+app.post('/upload/task/:id',userMiddleware,upload,async function(req : customRequest,res){
+
+    const taskId = parseInt(req.params.id)
+    const developerId = req.userId
+
+    if (!developerId) {
+        res.status(401).json({ message: 'Unauthorized. Developer ID missing.' });
+        return;
+    }
+    const bid = await prisma.bid.findFirst({
+        where : {
+            developerId : developerId,
+            taskId : taskId,
+            status : 'ACCEPTED'
+        }
+    })
+
+    if(!bid){
+        res.status(403).json({
+            message  : 'you are not allowed to upload for this task'
+        })
+        return;
+    }
+
+    // Safely extract the uploaded files array from req.files (since we're using multer.fields)
+    // Then get the path of the first uploaded file (assuming 'files' is the field name)
+    const files = (req.files as { [fieldname: string]: Express.Multer.File[] })?.files;
+    const filePath = files?.[0]?.path;
+
+
+    if(!filePath){
+        res.status(400).json({
+            message : 'Select the files'
+        })
+        return;
+    }
+
+    const file = await uploadOnCloudinary(filePath)
+
+    if (!file?.url) {
+         res.status(400).json({
+        message: "File upload failed",
+        });
+        return
+    }
+
+    const submission = await prisma.taskSubmission.create({
+        data : {
+            taskId : taskId,
+            developerId : developerId,
+            fileUrl : file?.url
+        }
+    })
+
+    await prisma.task.update({
+        where : {id : taskId},
+        data : {
+            status : 'SUBMITTED'
+        }
+    })
+
+
+    res.status(200).json({
+        message : 'Task Submitted',
+        submittedTask : submission
+    })
+
+
+
+
+})
+
+
+
+
+app.listen(3000,()=>{
+    console.log('server is running on http://localhost:3000')
+})

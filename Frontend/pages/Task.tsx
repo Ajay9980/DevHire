@@ -39,7 +39,7 @@ const Task = () => {
  
     const fetchTasks = async () => {
       try {
-        const res = await axios.get('${import.meta.env.VITE_BACKEND_URL}/api/task/tasks',{
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/task/tasks`,{
           withCredentials : true
         });  
         setTasks(res.data.tasks);  

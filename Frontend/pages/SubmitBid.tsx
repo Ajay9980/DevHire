@@ -24,7 +24,7 @@ function SubmitBid() {
 
     setReWriting(true)
 
-    const res = await axios.post('http://localhost:3000/api/rewrite/rewrite',{text : inputText},{
+    const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/rewrite/rewrite`,{text : inputText},{
       withCredentials : true
     })
 
@@ -38,7 +38,7 @@ function SubmitBid() {
    
 
   const getTask = async () => {
-    const res = await axios.get(`http://localhost:3000/api/task/task/${id}`, {
+    const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/task/task/${id}`, {
       withCredentials: true,
     });
     setTask(res.data.task);
@@ -47,7 +47,7 @@ function SubmitBid() {
   const handleBidSubmit = async (taskId: number) => {
     setButton(true)
     await axios.post(
-      `http://localhost:3000/api/bid/bid/${taskId}`,
+      `${import.meta.env.VITE_BACKEND_URL}/api/bid/bid/${taskId}`,
       {
         amount: Number(amount),
         proposal,

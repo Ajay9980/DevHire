@@ -11,7 +11,8 @@ const Profile = () => {
   const [earning , setEarning] = useState()
   async function getUser(){
 
-    const res = await axios.get("http://localhost:3000/api/user/user",{
+    // const res = await axios.get("http://localhost:3000/api/user/user",{
+    const res = await axios.get("${import.meta.env.VITE_BACKEND_URL}/api/user/user",{
       withCredentials : true
     })
 
@@ -26,6 +27,7 @@ const Profile = () => {
   async function getUserEarnings(){
 
     const res = await axios.get('http://localhost:3000/api/payment/getuserpayment',{
+    const res = await axios.get('${import.meta.env.VITE_BACKEND_URL}/api/payment/getuserpayment',{
       withCredentials : true
     })
    setEarning(res.data.earnings) 

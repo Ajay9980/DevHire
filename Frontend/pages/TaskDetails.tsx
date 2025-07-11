@@ -96,9 +96,9 @@ const TaskDetails = () => {
 
       
       const [userRes, taskRes, bidsRes ] = await Promise.all([
-        axios.get('http://localhost:3000/api/user/user', { withCredentials: true }),
-        axios.get(`http://localhost:3000/api/task/task/${id}`, { withCredentials: true }),
-        axios.get(`http://localhost:3000/api/bid/bid/${id}`, { withCredentials: true }),
+        axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/user/user`, { withCredentials: true }),
+        axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/task/task/${id}`, { withCredentials: true }),
+        axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/bid/bid/${id}`, { withCredentials: true }),
          
       ]);
       setUser(userRes.data.user);
@@ -125,7 +125,7 @@ const TaskDetails = () => {
 
   async function fileRes(){
 
-      const res = await axios.get(`http://localhost:3000/api/tasksubmission/getfileurl/${id}`,{withCredentials : true})
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/tasksubmission/getfileurl/${id}`,{withCredentials : true})
       setFile(res.data.file)
     }
 
@@ -179,12 +179,12 @@ const TaskDetails = () => {
 
     setProcessing(true)
     try {
-      await axios.post(`http://localhost:3000/api/bid/acceptbid/task/${id}`, { bidId }, {
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/bid/acceptbid/task/${id}`, { bidId }, {
         withCredentials: true
       });
       
       
-      const orderRes = await axios.post('http://localhost:3000/api/payment/createpayment',{taskId : id , bidId},{
+      const orderRes = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/payment/createpayment`,{taskId : id , bidId},{
         withCredentials : true
       })
 
@@ -213,7 +213,7 @@ const TaskDetails = () => {
         name : "DevHire",
         description : 'payment for accepted bid',
         handler : async function(response : any){
-          await axios.post(`http://localhost:3000/api/payment/verifypayment`,{
+          await axios.post(`/api/payment/verifypayment`,{
 
             razorpay_order_id : response.razorpay_order_id,
             razorpay_payment_id : response.razorpay_payment_id,
@@ -286,7 +286,7 @@ const TaskDetails = () => {
 
  
 
-      await axios.post(`http://localhost:3000/api/bid/bid/${id}`, { amount: Number(bidAmount), proposal: bidProposal }, {
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/bid/bid/${id}`, { amount: Number(bidAmount), proposal: bidProposal }, {
         withCredentials: true
       });
       Swal.fire({
@@ -321,7 +321,7 @@ const TaskDetails = () => {
   const handleSubmitTask = async () => {
     setIsSubmittingTask(true);
     try {
-      await axios.post(`http://localhost:3000/api/task/submittask/${id}`, {}, {
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/task/submittask/${id}`, {}, {
         withCredentials: true
       });
       Swal.fire({
@@ -354,7 +354,7 @@ const TaskDetails = () => {
   const markComplete = async () => {
     setIsMarkingComplete(true);
     try {
-      await axios.post(`http://localhost:3000/api/task/markcomplete/${id}`,{},{
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/task/markcomplete/${id}`,{},{
         withCredentials: true
       });
 

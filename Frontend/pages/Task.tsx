@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; // use this if you don’t have custom axios
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react';
-import Swal from 'sweetalert2';
+ 
  
 
 interface Task {

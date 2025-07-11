@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import Swal from "sweetalert2";
 import { motion } from "motion/react";
-import { FiCamera } from "react-icons/fi";
+ 
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const Signup = () => {
   });
 
   const [file , setFile] = useState<File | null>(null)
-  const [preview, setPreview] = useState<string | null>(null)
+ 
 
   const [loading, setLoading] = useState(false);
 

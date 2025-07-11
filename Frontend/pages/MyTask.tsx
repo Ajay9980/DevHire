@@ -85,7 +85,8 @@ function MyTask() {
       
 
    
-      const res = await axios.get("http://localhost:3000/api/task/task", {
+      // const res = await axios.get("http://localhost:3000/api/task/task", {
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/task/task`, {
         withCredentials: true,
       });
       setMyTasks(res.data.tasks);

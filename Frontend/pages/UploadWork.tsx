@@ -15,7 +15,7 @@ function UploadWork() {
 
   async function getTaskById() {
     try {
-      const res = await axios.get(`http://localhost:3000/api/task/task/${id}`, {
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/task/task/${id}`, {
         withCredentials: true,
       });
       setTask(res.data.task);
@@ -44,7 +44,7 @@ function UploadWork() {
 
     try {
       await axios.post(
-        `http://localhost:3000/api/tasksubmission/upload/task/${id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/tasksubmission/upload/task/${id}`,
         formData,
         {
           withCredentials: true,

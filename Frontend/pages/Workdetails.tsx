@@ -24,7 +24,7 @@ function Workdetails() {
   const [loading, setLoading] = useState(true);
 
   async function getUser() {
-    const res = await axios.get("http://localhost:3000/api/user/user", {
+    const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/user/user`, {
       withCredentials: true,
     });
     setUser(res.data.user);
@@ -32,7 +32,7 @@ function Workdetails() {
 
   async function getBidByTaskId() {
     const res = await axios.get(
-      `http://localhost:3000/api/bid/bidbytaskid/${id}`,
+      `${import.meta.env.VITE_BACKEND_URL}/api/bid/bidbytaskid/${id}`,
       {
         withCredentials: true,
       }

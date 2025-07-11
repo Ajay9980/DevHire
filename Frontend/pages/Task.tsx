@@ -23,7 +23,7 @@ const Task = () => {
 
   async function getUser(){
 
-    const res = await axios.get('http://localhost:3000/api/user/user',{
+    const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/user/user`,{
       withCredentials : true
     })
 
@@ -39,7 +39,7 @@ const Task = () => {
  
     const fetchTasks = async () => {
       try {
-        const res = await axios.get('http://localhost:3000/api/task/tasks',{
+        const res = await axios.get('${import.meta.env.VITE_BACKEND_URL}/api/task/tasks',{
           withCredentials : true
         });  
         setTasks(res.data.tasks);  

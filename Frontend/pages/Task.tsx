@@ -24,7 +24,10 @@ const Task = () => {
   async function getUser(){
 
     const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/user/user`,{
-      withCredentials : true
+      withCredentials : true,
+     headers : {
+      'Cache-control' : 'no-cache'
+     }
     })
 
     setUser(res.data.user)

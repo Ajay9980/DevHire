@@ -10,6 +10,9 @@ const prisma = new PrismaClient()
 dotenv.config()
 
 export const signup = async (req: Request, res: Response) => {
+
+  
+
   const { email, password, name, role  } = req.body;
 
   try {
@@ -59,6 +62,9 @@ export const signup = async (req: Request, res: Response) => {
 
 
 export const signin = async (req: Request, res: Response) => {
+
+     res.setHeader("Cache-Control", "no-store");
+  
   const { email, password } = req.body;
 
   try {
@@ -113,6 +119,9 @@ export const signin = async (req: Request, res: Response) => {
 
 
 export const signout = async(req : customRequest , res : Response)=>{
+
+ 
+      res.setHeader("Cache-Control", "no-store");
 
 
   try{

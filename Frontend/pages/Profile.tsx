@@ -47,6 +47,8 @@ const Profile = () => {
         withCredentials : true
       });
 
+     setUser(null)
+     
       Swal.fire({
         toast : true,
         position : 'top',
@@ -58,7 +60,6 @@ const Profile = () => {
         timer: 2000,
       });
 
-     setUser(null)
       navigate('/task')
 
       setTimeout(() => {

@@ -135,6 +135,8 @@ export const signout = async(req : customRequest , res : Response)=>{
 
 export const getUserById = async(req : customRequest , res : Response) => {
 
+    res.setHeader("Cache-Control", "no-store");
+
   const userId = req.userId
   try{
     const user = await prisma.user.findUnique({

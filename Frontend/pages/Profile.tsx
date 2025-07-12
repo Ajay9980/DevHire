@@ -58,11 +58,12 @@ const Profile = () => {
         timer: 2000,
       });
 
+     setUser(null)
       navigate('/task')
 
       setTimeout(() => {
         window.location.reload();
-      }, 2000);
+      }, 500);
     } catch (err) {
       Swal.fire({
         icon: 'error',

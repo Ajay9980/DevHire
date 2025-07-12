@@ -91,8 +91,8 @@ export const signin = async (req: Request, res: Response) => {
 
       res.cookie("token", token, {
         httpOnly: true,
-        secure: false,
-        sameSite: "lax"
+        secure: true,
+        sameSite: "none",
       });
 
       res.status(200).json({
